@@ -25,12 +25,6 @@ export function handleApplicationErrors(
     });
   }
 
-  if (err.name === "UnauthorizedError") {
-    return res.status(httpStatus.UNAUTHORIZED).send({
-      message: err.message,
-    });
-  }
-
   if (err.name === "NotFoundError") {
     return res.status(httpStatus.NOT_FOUND).send({
       message: err.message,
