@@ -5,7 +5,6 @@ import enrollmentRepository, { CreateEnrollmentParams } from "@/repositories/enr
 import { exclude } from "@/utils/prisma-utils";
 import { Address, Enrollment } from "@prisma/client";
 import { AxiosResponse } from "axios";
-import { ViaCEPAddress } from "../../../src/protocols.js";
 import { isValidPhone } from "@brazilian-utils/brazilian-utils";
 
 async function getAddressFromCEP(cep: string) {
