@@ -2,7 +2,11 @@ import { ApplicationError } from "@/protocols";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 
-export function handleApplicationErrors(err: ApplicationError | Error, _req: Request, res: Response) {
+export function handleApplicationErrors(
+  err: ApplicationError | Error,
+  _req: Request,
+  res: Response
+) {
   if (err.name === "CannotEnrollBeforeStartDateError") {
     return res.status(httpStatus.BAD_REQUEST).send({
       message: err.message,
@@ -16,12 +20,6 @@ export function handleApplicationErrors(err: ApplicationError | Error, _req: Req
   }
 
   if (err.name === "InvalidCredentialsError") {
-    return res.status(httpStatus.UNAUTHORIZED).send({
-      message: err.message,
-    });
-  }
-
-  if (err.name === "UnauthorizedError") {
     return res.status(httpStatus.UNAUTHORIZED).send({
       message: err.message,
     });
