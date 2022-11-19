@@ -1,6 +1,6 @@
 import { prisma } from "@/config";
 
-async function findMany(userId: number) {
+async function findManyTickets(userId: number) {
   return prisma.ticket.findMany({
     where: {
       Enrollment: {
@@ -14,7 +14,7 @@ async function findMany(userId: number) {
 }
 
 const ticketsRepository = {
-  findMany,
+  findManyTickets,
 };
 
 export default ticketsRepository;
