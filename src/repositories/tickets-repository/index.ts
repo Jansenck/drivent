@@ -1,5 +1,4 @@
 import { prisma } from "@/config";
-import { Ticket } from "@prisma/client";
 
 async function findMany(userId: number) {
   return prisma.ticket.findMany({
