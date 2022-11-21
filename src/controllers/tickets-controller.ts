@@ -2,9 +2,6 @@ import { Response } from "express";
 import httpStatus from "http-status";
 import ticketsService from "@/services/tickets-service";
 import { AuthenticatedRequest } from "@/middlewares";
-import enrollmentsService from "@/services/enrollments-service";
-import { notFoundError, unauthorizedError } from "@/errors";
-import { TicketType } from "@prisma/client";
 
 export async function getTicketsByUserId(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
