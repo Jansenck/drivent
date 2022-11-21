@@ -1,7 +1,7 @@
 import { notFoundError, unauthorizedError } from "@/errors"; 
 import ticketsRepository from "@/repositories/tickets-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
-import { Ticket } from "@prisma/client";
+import { prisma, Ticket } from "@prisma/client";
 
 async function postTicket(userId: number, ticketTypeId: number) {
   if(!ticketTypeId) {
@@ -29,9 +29,15 @@ async function getTickets(userId: number) {
   return tickets;
 }
 
+async function getTicketTypes() {
+  const ticketTypes = await ticketsRepository.findTicketsTypes();
+  return ticketTypes;
+}
+
 const ticketsService = {
   postTicket,
-  getTickets
+  getTickets,
+  getTicketTypes
 };
 
 export default ticketsService; 

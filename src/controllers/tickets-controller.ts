@@ -4,6 +4,7 @@ import ticketsService from "@/services/tickets-service";
 import { AuthenticatedRequest } from "@/middlewares";
 import enrollmentsService from "@/services/enrollments-service";
 import { notFoundError, unauthorizedError } from "@/errors";
+import { TicketType } from "@prisma/client";
 
 export async function getTicketsByUserId(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
@@ -13,6 +14,15 @@ export async function getTicketsByUserId(req: AuthenticatedRequest, res: Respons
     return res.send(tickets).status(httpStatus.OK);
   } catch (error) {
     return res.sendStatus(httpStatus.NOT_FOUND);
+  }
+}
+
+export async function getTicketsByTypeTicketId(_req: AuthenticatedRequest, res: Response) {
+  try {
+    const ticketTypes = await ticketsService.getTicketTypes();
+    return res.status(200).send(ticketTypes);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NO_CONTENT);
   }
 }
 
