@@ -1,11 +1,13 @@
-import { request } from "@/utils/request";
 import { notFoundError } from "@/errors";
+import { request } from "@/utils/request";
 import addressRepository, { CreateAddressParams } from "@/repositories/address-repository";
 import enrollmentRepository, { CreateEnrollmentParams } from "@/repositories/enrollment-repository";
 import { exclude } from "@/utils/prisma-utils";
 import { Address, Enrollment } from "@prisma/client";
 import { AxiosResponse } from "axios";
 import { isValidPhone } from "@brazilian-utils/brazilian-utils";
+import { AddressEnrollment } from "@/protocols";
+import { getAddress } from "@/utils/cep-service";
 
 async function getAddressFromCEP(cep: string) {
   const result  = await request.get(`https://viacep.com.br/ws/${cep}/json/`);
