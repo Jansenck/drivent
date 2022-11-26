@@ -1,29 +1,32 @@
 import { notFoundError, unauthorizedError } from "@/errors"; 
 import ticketsRepository from "@/repositories/tickets-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
-import { Ticket } from "@prisma/client";
+import { TicketStatus } from "@prisma/client";
 
 async function postTicket(userId: number, ticketTypeId: number) {
-  if(!ticketTypeId) {
-    throw unauthorizedError();
-  }
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if(!enrollment.Address[0].enrollmentId) throw notFoundError();
+  if (!enrollment) {
+    throw notFoundError();
+  }
 
-  const { enrollmentId } = enrollment.Address[0];
-  const newTicket: Ticket = await ticketsRepository.createOrUpdateTicket(undefined, enrollmentId, ticketTypeId);
-  if(!newTicket) throw notFoundError();
+  const ticketData = {
+    ticketTypeId,
+    enrollmentId: enrollment.id,
+    status: TicketStatus.RESERVED
+  };
 
-  const getNewTicket = await getTickets(userId);
+  await ticketsRepository.createTicket(ticketData);
 
-  return getNewTicket;
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+
+  return ticket;
 }
 
 async function getTickets(userId: number) {
   const isValidEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if(!isValidEnrollment.Address[0].enrollmentId) throw unauthorizedError();
 
-  const [tickets] = await ticketsRepository.findManyTickets(userId);
+  const tickets = await ticketsRepository.findTickets(userId);
   if(!tickets.enrollmentId) throw notFoundError();
 
   return tickets;
