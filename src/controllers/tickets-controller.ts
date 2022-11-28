@@ -31,9 +31,12 @@ export async function postNewTicket(req: AuthenticatedRequest, res: Response) {
     const newTicket = await ticketsService.postTicket(userId, ticketTypeId);
     return res.status(httpStatus.CREATED).send(newTicket);
   } catch (error) {
-    if(error.name === "TypeError") {
+    if(error.name === "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
     } 
+    if(error.name === "RequestError") {
+      return res.sendStatus(httpStatus.BAD_REQUEST);
+    }
     if(error.name === "UnauthorizedError") {
       return res.sendStatus(httpStatus.BAD_REQUEST);
     }

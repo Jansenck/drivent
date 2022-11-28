@@ -1,4 +1,4 @@
-import { notFoundError, unauthorizedError, requestError } from "@/errors";
+import { notFoundError, requestError, unauthorizedError } from "@/errors";
 import hotelsRepository from "@/repositories/hotels-repository";
 import ticketsRepository from "@/repositories/tickets-repository";
 import paymentRepository from "@/repositories/payment-repository";
@@ -11,7 +11,7 @@ async function getManyHotels(userId: number, ticketId: number) {
   const ticket = await ticketsRepository.findTicketsById(ticketId);
   if(!ticket) throw notFoundError();
   if(ticket.enrollmentId !== enrollment.id) throw unauthorizedError();
-  /* TODO: analisar se é válido retornar o status do ticket pelo ticket.status */
+  
   const payment = await paymentRepository.findPaymentByTicketId(ticket.id);
   if(!payment) throw notFoundError();
   
@@ -19,8 +19,24 @@ async function getManyHotels(userId: number, ticketId: number) {
   return hotels;
 }
 
+async function getHotelWithRooms(userId: number, hotelId: number) {
+  if(!userId || !hotelId) throw requestError(400, "BAD_REQUEST");
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if(!enrollment) throw unauthorizedError();
+
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+  if(!ticket.TicketType.includesHotel) throw notFoundError();
+
+  const hotel = await hotelsRepository.findHotelById(hotelId);
+  if(!hotel) throw notFoundError();
+
+  const hotelWithRooms = await hotelsRepository.findHotelWithRooms(hotelId);
+  return hotelWithRooms;
+}
+
 const hotelsService = {
-  getManyHotels
+  getManyHotels,
+  getHotelWithRooms
 };
 
 export default hotelsService;

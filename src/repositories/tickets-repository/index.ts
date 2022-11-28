@@ -55,7 +55,7 @@ async function findTicketByEnrollmentId(enrollmentId: number) {
       enrollmentId,
     },
     include: {
-      TicketType: true, //inner join
+      TicketType: true,
     }
   });
 }

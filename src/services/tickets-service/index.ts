@@ -1,9 +1,11 @@
-import { notFoundError, unauthorizedError } from "@/errors"; 
+import { notFoundError, requestError, unauthorizedError } from "@/errors"; 
 import ticketsRepository from "@/repositories/tickets-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import { TicketStatus } from "@prisma/client";
 
 async function postTicket(userId: number, ticketTypeId: number) {
+  if(!ticketTypeId) throw requestError(400, "BAD_REQUEST");
+
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) {
     throw notFoundError();
