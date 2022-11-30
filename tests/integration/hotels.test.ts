@@ -3,7 +3,6 @@ import * as jwt from "jsonwebtoken";
 import faker from "@faker-js/faker";
 import httpStatus from "http-status";
 import app, { init } from "@/app";
-import { prisma } from "@/config";
 import { TicketStatus } from "@prisma/client";
 import { cleanDb, generateValidToken } from "../helpers";
 import { 
@@ -15,7 +14,6 @@ import {
   createPayment,
   createHotel,
   createRooms,
-  createBooking
 } from "../factories";
 
 beforeAll( async () => {
@@ -123,6 +121,9 @@ describe("GET /hotels", () => {
       await createPayment(ticket.id, ticketType.price);
       const hotels = await createHotel();
 
+      console.log( hotels.createdAt.toISOString());
+      console.log( "ISO: ", hotels.createdAt.toISOString());
+
       const response = await server
         .get("/hotels")
         .set("Authorization", `Bearer ${token}`)
@@ -136,6 +137,23 @@ describe("GET /hotels", () => {
         createdAt: hotels.createdAt.toISOString(),
         updatedAt: hotels.updatedAt.toISOString(),
       });
+    });
+
+    it("should respond with status 200 and empty array", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      await createPayment(ticket.id, ticketType.price);
+
+      const response = await server
+        .get("/hotels")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ ticketId: ticket.id });
+
+      expect(response.status).toEqual(httpStatus.OK);
+      expect(response.body).toEqual([]);
     });
   });
 });
@@ -215,6 +233,31 @@ describe("GET /hotels/hotelId", () => {
           createdAt: rooms.createdAt.toISOString(),
           updatedAt: rooms.updatedAt.toISOString()
         }],
+        createdAt: hotels.createdAt.toISOString(),
+        updatedAt: hotels.updatedAt.toISOString()
+      });
+    });
+
+    it("should respond with status 200 and hotel with room with empty array", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      await createPayment(ticket.id, ticketType.price);
+      const hotels = await createHotel();
+
+      const response = await server
+        .get(`/hotels/${hotels.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({ ticketId: ticket.id });
+
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual({
+        id: hotels.id,
+        name: hotels.name,
+        image: hotels.image,
+        Rooms: [],
         createdAt: hotels.createdAt.toISOString(),
         updatedAt: hotels.updatedAt.toISOString()
       });
