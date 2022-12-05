@@ -7,7 +7,8 @@ import roomsRepository from "@/repositories/rooms-repository";
 import ticketsRepository from "@/repositories/tickets-repository";
 
 async function listBookingByUserId(userId: number, roomId: number) {
-  if(!roomId) throw requestError(403, "FORBIDDEN");
+  if(roomId === null || roomId === undefined) throw requestError(403, "FORBIDDEN");
+  if(roomId < 1) throw requestError(400, "BAD_REQUEST");
   
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if(!enrollment) throw notFoundError();
@@ -26,12 +27,12 @@ async function listBookingByUserId(userId: number, roomId: number) {
   if(!room) throw notFoundError();
 
   const booking = await bookingsRepository.findBookingByRoomId(roomId);
-
   return booking;
 }
 
 async function postBooking(userId: number, roomId: number) {
-  if(!roomId) throw requestError(403, "FORBIDDEN");
+  if(roomId === null || roomId === undefined) throw requestError(403, "FORBIDDEN");
+  if(roomId < 1) throw requestError(400, "BAD_REQUEST");
   
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if(!enrollment) throw notFoundError();
@@ -57,7 +58,8 @@ async function postBooking(userId: number, roomId: number) {
 }
 
 async function updateBooking(userId: number, roomId: number,  bookingId: number) {
-  if(!bookingId ) throw requestError(403, "FORBIDDEN");
+  if(roomId === null || roomId === undefined) throw requestError(403, "FORBIDDEN");
+  if(roomId < 1) throw requestError(400, "BAD_REQUEST");
 
   const room = await roomsService.getRoomWithBookings(roomId);
   if(room.length === 0) throw notFoundError();
