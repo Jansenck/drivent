@@ -63,8 +63,12 @@ describe("GET /hotels", () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       await createEnrollmentWithAddress(user);
+      const ticketId = faker.datatype.number();
 
-      const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+      const response = await server
+        .get("/hotels")
+        .set("Authorization", `Bearer ${token}`)
+        .send( { ticketId } );
 
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
@@ -87,12 +91,12 @@ describe("GET /hotels", () => {
       expect(response.status).toBe(httpStatus.UNAUTHORIZED);
     });
 
-    it("it should respond with status 400  when given ticket type doesnt include hotel", async () => {
+    it("should respond with status 403  when given ticket type doesnt include hotel", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithOrWithoutHotel(true, false);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotelId = faker.datatype.number();
 
@@ -101,7 +105,7 @@ describe("GET /hotels", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({ ticketId: ticket.id });
 
-      expect(response.status).toBe(httpStatus.NOT_FOUND);
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 404 if payment doesnt exist", async () => {
@@ -117,12 +121,9 @@ describe("GET /hotels", () => {
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotels = await createHotel();
-
-      console.log( hotels.createdAt.toISOString());
-      console.log( "ISO: ", hotels.createdAt.toISOString());
 
       const response = await server
         .get("/hotels")
@@ -144,7 +145,7 @@ describe("GET /hotels", () => {
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
 
       const response = await server
@@ -158,7 +159,7 @@ describe("GET /hotels", () => {
   });
 });
 
-describe("GET /hotels/hotelId", () => {
+describe("GET /hotels/:hotelId", () => {
   it("should respond with status 401 if no token is given", async () => {
     const response = await server.get("/hotels/1");
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
@@ -188,12 +189,12 @@ describe("GET /hotels/hotelId", () => {
       expect(response.status).toEqual(httpStatus.BAD_REQUEST);
     });
 
-    it("it should respond with status 404 when given hotel doesnt exist", async () => {
+    it("should respond with status 404 when given hotel doesnt exist", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketTypeWithOrWithoutHotel(true, false);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotelId = faker.datatype.number();
 
@@ -210,7 +211,7 @@ describe("GET /hotels/hotelId", () => {
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotels = await createHotel();
       const rooms = await createRooms(hotels.id);
@@ -243,7 +244,7 @@ describe("GET /hotels/hotelId", () => {
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketTypeWithOrWithoutHotel(false, true);
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       await createPayment(ticket.id, ticketType.price);
       const hotels = await createHotel();
 

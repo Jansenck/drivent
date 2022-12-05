@@ -128,7 +128,6 @@ describe("POST /payments/process", () => {
     const token = jwt.sign({ userId: userWithoutSession.id }, process.env.JWT_SECRET);
 
     const response = await server.post("/payments/process").set("Authorization", `Bearer ${token}`);
-
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
 
@@ -242,7 +241,6 @@ describe("POST /payments/process", () => {
       await server.post("/payments/process").set("Authorization", `Bearer ${token}`).send(body);
 
       const updatedTicket = await prisma.ticket.findUnique({ where: { id: ticket.id } });
-
       expect(updatedTicket.status).toEqual(TicketStatus.PAID);
     });
   });
