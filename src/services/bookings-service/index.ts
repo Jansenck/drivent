@@ -14,9 +14,7 @@ async function listBookingByUserId(userId: number, roomId: number) {
   
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if(!ticket) throw notFoundError();
-  
   if(ticket.status !== "PAID") throw requestError(402, "PAYMENT_REQUIRED");
-  
   if( ticket.TicketType.isRemote || !ticket.TicketType.includesHotel ) {
     throw requestError(400, "BAD_REQUEST");
   }
