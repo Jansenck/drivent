@@ -7,9 +7,7 @@ async function postTicket(userId: number, ticketTypeId: number) {
   if(!ticketTypeId) throw requestError(400, "BAD_REQUEST");
 
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if (!enrollment) {
-    throw notFoundError();
-  }
+  if(!enrollment) throw notFoundError();
 
   const ticketData = {
     ticketTypeId,
@@ -25,11 +23,13 @@ async function postTicket(userId: number, ticketTypeId: number) {
 }
 
 async function getTickets(userId: number) {
-  const isValidEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if(!isValidEnrollment.Address[0].enrollmentId) throw unauthorizedError();
+  if(!userId) throw notFoundError();
+
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if(!enrollment) throw notFoundError();
 
   const tickets = await ticketsRepository.findTickets(userId);
-  if(!tickets.enrollmentId) throw notFoundError();
+  if(!tickets) throw notFoundError();
 
   return tickets;
 }

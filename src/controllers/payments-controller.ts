@@ -8,10 +8,9 @@ import { Payment } from "@prisma/client";
 export async function postPayment(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { ticketId, cardData } = req.body;
-
   try {
     const payment = await paymentService.createPayment(userId, ticketId, cardData);
-  
+    
     return res.status(httpStatus.OK).send(payment);
   } catch (error) {
     if(error.name === "RequestError") {
@@ -20,10 +19,9 @@ export async function postPayment(req: AuthenticatedRequest, res: Response) {
     if(error.name === "UnauthorizedError") {
       return res.sendStatus(httpStatus.UNAUTHORIZED);
     }
-    if(error.name === "TypeError") {
+    if(error.name === "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
     }
-    return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
 

@@ -11,6 +11,7 @@ async function getManyHotels(userId: number, ticketId: number) {
   const ticket = await ticketsRepository.findTicketsById(ticketId);
   if(!ticket) throw notFoundError();
   if(ticket.enrollmentId !== enrollment.id) throw unauthorizedError();
+  if(ticket.status !== "PAID") throw requestError(403, "FORBIDDEN");
   
   const payment = await paymentRepository.findPaymentByTicketId(ticket.id);
   if(!payment) throw notFoundError();
@@ -23,10 +24,12 @@ async function getHotelWithRooms(userId: number, hotelId: number) {
   if(!userId || !hotelId) throw requestError(400, "BAD_REQUEST");
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if(!enrollment) throw unauthorizedError();
-
+  
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
-  if(!ticket.TicketType.includesHotel) throw notFoundError();
-
+  if(!ticket) throw notFoundError();
+  if(ticket.status !== "PAID") throw requestError(403, "FORBIDDEN");
+  if(!ticket.TicketType.includesHotel || ticket.TicketType.isRemote) throw requestError(403, "FORBIDDEN");
+  
   const hotel = await hotelsRepository.findHotelById(hotelId);
   if(!hotel) throw notFoundError();
 

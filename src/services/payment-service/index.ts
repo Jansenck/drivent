@@ -6,10 +6,11 @@ import enrollmentsService from "../enrollments-service";
 async function createPayment(userId: number, ticketId: number, cardData: createOrUpdatePayment) {
   if(!ticketId || !cardData) throw requestError(400, "BAD_REQUEST");
   const enrollment = await enrollmentsService.getOneWithAddressByUserId(userId);
+  if(!enrollment) throw notFoundError();
   
   const ticket = await ticketsRepository.findTicketsById(ticketId);
   if(!ticket) throw notFoundError();
-  if(ticket.enrollmentId !== enrollment.id || !enrollment) throw unauthorizedError();
+  if(ticket.enrollmentId !== enrollment.id) throw unauthorizedError();
 
   const paymentData = {
     ticketId,
@@ -21,7 +22,6 @@ async function createPayment(userId: number, ticketId: number, cardData: createO
   const payment = await paymentRepository.createPayment(ticketId, paymentData);
 
   await ticketsRepository.ticketProcessPayment(ticketId);
-
   return payment;
 }
 

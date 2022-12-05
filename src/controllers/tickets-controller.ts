@@ -10,7 +10,12 @@ export async function getTicketsByUserId(req: AuthenticatedRequest, res: Respons
     const tickets = await ticketsService.getTickets(userId);
     return res.send(tickets).status(httpStatus.OK);
   } catch (error) {
-    return res.sendStatus(httpStatus.NOT_FOUND);
+    if(error.name === "UnauthorizedError") {
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
+    }
+    if(error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
   }
 }
 
