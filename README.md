@@ -1,4 +1,4 @@
-# drivent-back
+# drivent-backend
 
 Back-end for Driven.t, an event management solution.
 
@@ -130,5 +130,3 @@ There are several things you need to do when you add new ENV VARIABLES:
 - Add them to your docker-compose.yml file (just the name, not the value). Only envs listed in the environment section will be exposed to your docker container.
 - Add them (prod version) to your github repo secrets. They will be used to generate the `.env` file on deploy.
 - Add them (prod version) to test.yml file on .github/workflows/test.yml.
-# drivent
-# drivent
